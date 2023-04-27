@@ -17,7 +17,7 @@ export class TelegramUser extends TimeStamps {
 export class UserModel extends TimeStamps {
   @prop({ unique: true })
   login: string;
-  @prop({ unique: true })
+  @prop()
   email: string;
   @prop()
   emailOrLogin?: string;
@@ -29,6 +29,6 @@ export class UserModel extends TimeStamps {
   subscribeExpiresAt?: Date = new Date();
   @prop({ default: false })
   isAdmin: boolean;
-  @prop({ default: {} })
-  telegram: TelegramUser;
+  @prop({ each: true })
+  telegram: string[];
 }

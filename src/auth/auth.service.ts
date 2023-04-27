@@ -75,6 +75,12 @@ export class AuthService {
     };
   }
   async telegramRegister(dto: TelegramRegisterDto) {
+    const checkEmail = await this.UserModel.findOneAndUpdate(
+      { email: dto.email },
+      { telegram: dto.telegramID },
+      { new: true },
+    ).exec();
+
     const IDMatch = await this.TelegramUser.findOne({
       telegramID: dto.telegramID,
     });
@@ -89,17 +95,9 @@ export class AuthService {
     });
     const user = await newUser.save();
     const tokens = await this.issueTokenPair(String(user._id));
-    const telegramUser = await this.TelegramUser.findOne({
-      email: dto.email,
-    });
-    const commonUser = await this.UserModel.findOne({
-      email: dto.email,
-    });
-    // console.log(commonUser.email);
-    if (telegramUser.email === commonUser.email) {
-      commonUser.telegram = telegramUser;
-    }
+
     return {
+      checkEmail,
       user: user.firstName,
       email: user.email,
       telegramID: dto.telegramID,
