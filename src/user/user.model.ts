@@ -12,6 +12,10 @@ export class TelegramUser extends TimeStamps {
   photoURL: string;
   @prop({ unique: true })
   telegramID: number;
+  @prop({ default: false })
+  activated: boolean;
+  @prop()
+  activationLink: string;
 }
 
 export class UserModel extends TimeStamps {
@@ -31,4 +35,8 @@ export class UserModel extends TimeStamps {
   isAdmin: boolean;
   @prop({ each: true })
   telegram: string[];
+  @prop({ default: false })
+  activated: boolean;
+  @prop()
+  activationLink: string;
 }

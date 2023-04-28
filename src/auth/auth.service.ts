@@ -15,7 +15,8 @@ import {
 import { compare, genSalt, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
-
+import { MailService } from '../service/mail.service';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class AuthService {
   constructor(
@@ -34,6 +35,7 @@ export class AuthService {
     };
   }
   async register(dto: RegisterDto) {
+    const mailService = new MailService();
     const emailMatch = await this.UserModel.findOne({
       email: dto.email,
     });
@@ -50,10 +52,23 @@ export class AuthService {
     const newUser = new this.UserModel({
       email: dto.email,
       login: dto.login,
+      activationLink: uuidv4(),
       password: await hash(dto.password, salt),
     });
+
+    const tokens = await this.issueTokenPair(String(newUser._id));
+    const telegramUser = await this.TelegramUser.findOne({ email: dto.email });
+    if ((telegramUser && telegramUser.activated) || newUser.activated) {
+      newUser.activated = true;
+      telegramUser.activated = true;
+    }
+    if ((telegramUser && !telegramUser.activated) || !newUser.activated) {
+      await mailService.sendActivationMail(
+        dto.email,
+        `${process.env.API_URL}/api/auth/activate/${newUser.activationLink}`,
+      );
+    }
     const user = await newUser.save();
-    const tokens = await this.issueTokenPair(String(user._id));
     return {
       user: this.returnUserFields(user),
       ...tokens,
@@ -75,6 +90,10 @@ export class AuthService {
     };
   }
   async telegramRegister(dto: TelegramRegisterDto) {
+    const mailService = new MailService();
+    const commonUser = await this.UserModel.findOne({
+      email: dto.email,
+    }).exec();
     const checkEmail = await this.UserModel.findOneAndUpdate(
       { email: dto.email },
       { telegram: dto.telegramID },
@@ -89,13 +108,24 @@ export class AuthService {
     }
     const newUser = new this.TelegramUser({
       email: dto.email,
+      activationLink: uuidv4(),
       telegramID: dto.telegramID,
       photoURL: dto.photoURL,
       firstName: dto.firstName,
     });
-    const user = await newUser.save();
-    const tokens = await this.issueTokenPair(String(user._id));
 
+    const tokens = await this.issueTokenPair(String(newUser._id));
+    if (newUser.activated || (commonUser && commonUser.activated)) {
+      newUser.activated = true;
+      commonUser && (commonUser.activated = true); // check for null before modifying object
+    }
+    if (!newUser.activated || (commonUser && !commonUser.activated)) {
+      await mailService.sendActivationMail(
+        dto.email,
+        `${process.env.API_URL}/api/auth/activate/${newUser.activationLink}`,
+      );
+    }
+    const user = await newUser.save();
     return {
       checkEmail,
       user: user.firstName,
@@ -105,6 +135,29 @@ export class AuthService {
       ...tokens,
     };
   }
+  async activate(activationLink: string) {
+    const user = await this.UserModel.findOne({ activationLink });
+    if (!user) {
+      const telegramUser = await this.TelegramUser.findOne({ activationLink });
+      if (!telegramUser) {
+        throw new Error('Неккоректная ссылка');
+      } else {
+        telegramUser.activated = true;
+        await telegramUser.save();
+      }
+    } else {
+      const findTelegram = await this.TelegramUser.findOne({
+        telegram: user.telegram[0],
+      });
+      if (findTelegram) {
+        findTelegram.activated = true;
+        await findTelegram.save();
+      }
+      user.activated = true;
+      await user.save();
+    }
+  }
+
   async validateUser(dto: AuthDto): Promise<UserModel> {
     const User = await this.UserModel.findOne({
       $or: [{ email: dto.emailOrLogin }, { login: dto.emailOrLogin }],

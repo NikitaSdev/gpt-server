@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
-import { UserModel } from './user.model';
+import { TelegramUser, UserModel } from './user.model';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { genSalt, hash } from 'bcryptjs';
@@ -9,7 +9,26 @@ import { genSalt, hash } from 'bcryptjs';
 export class UserService {
   constructor(
     @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>,
-  ) {}
+    @InjectModel(TelegramUser)
+    private readonly TelegramUser: ModelType<TelegramUser>,
+  ) {
+    setInterval(async () => {
+      const commonUsersToDelete = await this.UserModel.find({
+        activated: false,
+      });
+      const telegramUsersToDelete = await this.TelegramUser.find({
+        activated: false,
+      });
+      for (const user of commonUsersToDelete) {
+        await user.remove();
+        console.log(`User with email ${user.email} has been removed.`);
+      }
+      for (const user of telegramUsersToDelete) {
+        await user.remove();
+        console.log(`User with email ${user.email} has been removed.`);
+      }
+    }, 7 * 24 * 60 * 60 * 1000);
+  }
   async byId(_id: string) {
     const user = await this.UserModel.findById(_id).exec();
     if (!user) {

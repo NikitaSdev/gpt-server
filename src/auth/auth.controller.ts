@@ -3,7 +3,9 @@ import {
   Controller,
   HttpCode,
   Post,
+  Param,
   UsePipes,
+  Get,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -19,6 +21,11 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 export class AuthController {
   constructor(private readonly AuthService: AuthService) {}
 
+  @HttpCode(200)
+  @Get('activate/:link')
+  async activate(@Param('link') link: string) {
+    return this.AuthService.activate(link);
+  }
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('register')
