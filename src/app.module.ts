@@ -6,6 +6,7 @@ import { getMongoDbConfig } from "./config/mongo.config"
 import {AuthModule} from "./auth/auth.module";
 import {UserModule} from "./user/user.module";
 import { TypegooseModule } from "nestjs-typegoose";
+import { PaymentModule } from './payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -16,6 +17,7 @@ import { TypegooseModule } from "nestjs-typegoose";
     }),
     AuthModule,
     UserModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,7 @@ import { TelegramUser, UserModel } from './user.model';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { genSalt, hash } from 'bcryptjs';
+import { subscribeDTO } from './dto/subscribe.dto';
 
 @Injectable()
 export class UserService {
@@ -73,5 +74,13 @@ export class UserService {
   }
   async delete(id: string) {
     return this.UserModel.findByIdAndDelete(id).exec();
+  }
+  async getSubscribe(dto: subscribeDTO) {
+    const user = await this.UserModel.findOne({ email: dto.email });
+    if (dto.paid) {
+      user.subscribe = true;
+      user.save();
+    }
+    return user;
   }
 }

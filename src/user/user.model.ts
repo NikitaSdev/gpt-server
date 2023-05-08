@@ -16,6 +16,10 @@ export class TelegramUser extends TimeStamps {
   activated: boolean;
   @prop()
   activationLink: string;
+  @prop({ default: false })
+  subscribe: boolean;
+  @prop()
+  subscribeExpiresAt?: Date = new Date();
 }
 
 export class UserModel extends TimeStamps {

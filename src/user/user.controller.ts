@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Post,
   Put,
   Query,
   UsePipes,
@@ -15,6 +16,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from './decorators/user.decorator';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { IdValidationPipe } from '../pipes/id.validation.pipe';
+import { subscribeDTO } from './dto/subscribe.dto';
 
 @Controller('users')
 export class UserController {
@@ -23,6 +25,10 @@ export class UserController {
   @Auth()
   async getProfile(@User('_id') _id: string) {
     return this.userService.byId(_id);
+  }
+  @Post('getSubscribe')
+  async getSubscribe(@Body() dto: subscribeDTO) {
+    return this.userService.getSubscribe(dto);
   }
   @UsePipes(new ValidationPipe())
   @Put('profile')
