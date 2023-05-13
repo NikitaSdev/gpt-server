@@ -6,55 +6,55 @@ import {
   Param,
   UsePipes,
   Get,
-  ValidationPipe,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
+  ValidationPipe
+} from "@nestjs/common"
+import { AuthService } from "./auth.service"
 import {
   AuthDto,
   RegisterDto,
   TelegramLoginDto,
-  TelegramRegisterDto,
-} from './dto/auth.dto';
-import { RefreshTokenDto } from './dto/refreshToken.dto';
+  TelegramRegisterDto
+} from "./dto/auth.dto"
+import { RefreshTokenDto } from "./dto/refreshToken.dto"
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
   constructor(private readonly AuthService: AuthService) {}
 
   @HttpCode(200)
-  @Get('activate/:link')
-  async activate(@Param('link') link: string) {
-    return this.AuthService.activate(link);
+  @Get("activate/:link")
+  async activate(@Param("link") link: string) {
+    return this.AuthService.activate(link)
   }
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('register')
+  @Post("register")
   async register(@Body() dto: RegisterDto) {
-    return this.AuthService.register(dto);
+    return this.AuthService.register(dto)
   }
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('login')
+  @Post("login")
   async login(@Body() dto: AuthDto) {
-    return this.AuthService.login(dto);
+    return this.AuthService.login(dto)
   }
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('login/telegram')
+  @Post("login/telegram")
   async telegramLogin(@Body() dto: TelegramLoginDto) {
-    return this.AuthService.telegramLogin(dto);
+    return this.AuthService.telegramLogin(dto)
   }
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('register/telegram')
+  @Post("register/telegram")
   async telegramRegister(@Body() dto: TelegramRegisterDto) {
-    return this.AuthService.telegramRegister(dto);
+    return this.AuthService.telegramRegister(dto)
   }
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('login/access-token')
+  @Post("login/access-token")
   async getNewTokens(@Body() dto: RefreshTokenDto) {
-    return this.AuthService.getNewTokens(dto);
+    return this.AuthService.getNewTokens(dto)
   }
 }

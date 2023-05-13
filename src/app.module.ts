@@ -1,12 +1,14 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module } from "@nestjs/common"
+import { AppController } from "./app.controller"
+import { AppService } from "./app.service"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { getMongoDbConfig } from "./config/mongo.config"
-import {AuthModule} from "./auth/auth.module";
-import {UserModule} from "./user/user.module";
-import { TypegooseModule } from "nestjs-typegoose";
-import { PaymentModule } from './payment/payment.module';
+import { AuthModule } from "./auth/auth.module"
+import { UserModule } from "./user/user.module"
+import { TypegooseModule } from "nestjs-typegoose"
+import { PaymentModule } from "./payment/payment.module"
+import { TaskModule } from "./task/task.module"
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -18,8 +20,9 @@ import { PaymentModule } from './payment/payment.module';
     AuthModule,
     UserModule,
     PaymentModule,
+    TaskModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}

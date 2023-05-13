@@ -1,38 +1,38 @@
-import { IsEmail, IsString, MinLength, IsNumber } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNumber } from "class-validator"
 
 export class AuthDto {
   @IsString()
-  emailOrLogin: string;
+  emailOrLogin: string
 
   @MinLength(6, {
-    message: 'Password must contains at least 6 characters',
+    message: "Password must contains at least 6 characters"
   })
   @IsString()
-  password: string;
+  password: string
 }
 export class RegisterDto {
   @IsEmail()
-  email: string;
+  email: string
   @IsString()
-  login: string;
+  login: string
 
   @MinLength(6, {
-    message: 'Password must contains at least 6 characters',
+    message: "Password must contains at least 6 characters"
   })
   @IsString()
-  password: string;
+  password: string
 }
 export class TelegramLoginDto {
   @IsNumber()
-  telegramID: number;
+  telegramID: number
 }
 export class TelegramRegisterDto {
   @IsEmail()
-  email: string;
+  email: string
   @IsNumber()
-  telegramID: number;
+  telegramID: number
   @IsString()
-  firstName: string;
+  firstName: string
   @IsString()
-  photoURL: string;
+  photoURL: string
 }

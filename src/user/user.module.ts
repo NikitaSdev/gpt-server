@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
-import { TypegooseModule } from 'nestjs-typegoose';
-import { TelegramUser, UserModel } from './user.model';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from "@nestjs/common"
+import { UserService } from "./user.service"
+import { UserController } from "./user.controller"
+import { TypegooseModule } from "nestjs-typegoose"
+import { TelegramUser, UserModel } from "./user.model"
+import { ConfigModule } from "@nestjs/config"
 
 @Module({
   imports: [
@@ -11,19 +11,19 @@ import { ConfigModule } from '@nestjs/config';
       {
         typegooseClass: UserModel,
         schemaOptions: {
-          collection: 'User',
-        },
+          collection: "User"
+        }
       },
       {
         typegooseClass: TelegramUser,
         schemaOptions: {
-          collection: 'Telegram',
-        },
-      },
+          collection: "Telegram"
+        }
+      }
     ]),
-    ConfigModule,
+    ConfigModule
   ],
   providers: [UserService],
-  controllers: [UserController],
+  controllers: [UserController]
 })
 export class UserModule {}

@@ -1,46 +1,50 @@
-import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import { prop } from '@typegoose/typegoose';
+import { Base, TimeStamps } from "@typegoose/typegoose/lib/defaultClasses"
+import { prop } from "@typegoose/typegoose"
 
 export interface UserModel extends Base {}
 export interface TelegramUser extends Base {}
 export class TelegramUser extends TimeStamps {
   @prop()
-  email: string;
+  email: string
   @prop()
-  firstName: string;
+  firstName: string
   @prop()
-  photoURL: string;
+  photoURL: string
   @prop({ unique: true })
-  telegramID: number;
+  telegramID: number
   @prop({ default: false })
-  activated: boolean;
+  activated: boolean
   @prop()
-  activationLink: string;
+  activationLink: string
   @prop({ default: false })
-  subscribe: boolean;
-  @prop()
-  subscribeExpiresAt?: Date = new Date();
+  subscribe: boolean
+  @prop({ default: new Date() })
+  subscribeExpiresAt: Date = new Date()
+  @prop({ default: "" })
+  payment_id: string
 }
 
 export class UserModel extends TimeStamps {
   @prop({ unique: true })
-  login: string;
+  login: string
   @prop()
-  email: string;
+  email: string
   @prop()
-  emailOrLogin?: string;
+  emailOrLogin?: string
   @prop()
-  password: string;
+  password: string
   @prop({ default: false })
-  subscribe: boolean;
-  @prop()
-  subscribeExpiresAt?: Date = new Date();
+  subscribe: boolean
+  @prop({ default: new Date() })
+  subscribeExpiresAt: Date = new Date()
   @prop({ default: false })
-  isAdmin: boolean;
+  isAdmin: boolean
   @prop({ each: true })
-  telegram: string[];
+  telegram: number[]
   @prop({ default: false })
-  activated: boolean;
+  activated: boolean
   @prop()
-  activationLink: string;
+  activationLink: string
+  @prop({ default: "" })
+  payment_id: string
 }
