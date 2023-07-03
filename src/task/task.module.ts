@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common"
 import { TypegooseModule } from "nestjs-typegoose"
-import { TelegramUser, UserModel } from "../user/user.model"
+import { TelegramUser } from "../user/user.model"
 import { ConfigModule } from "@nestjs/config"
 import { TaskService } from "./task.service"
 import { ScheduleModule } from "@nestjs/schedule"
@@ -9,12 +9,6 @@ import { ScheduleModule } from "@nestjs/schedule"
   imports: [
     ScheduleModule.forRoot(),
     TypegooseModule.forFeature([
-      {
-        typegooseClass: UserModel,
-        schemaOptions: {
-          collection: "User"
-        }
-      },
       {
         typegooseClass: TelegramUser,
         schemaOptions: {

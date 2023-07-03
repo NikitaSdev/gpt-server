@@ -23,6 +23,7 @@ export class PaymentController {
   @HttpCode(200)
   @Post("status")
   async getPaymentStatus(@Body() dto: PaymentStatusDto) {
+    console.log(dto)
     return this.paymentService.paymentStatus(dto)
   }
 }

@@ -1,8 +1,6 @@
-import { IsEmail, IsNumber } from "class-validator"
+import { IsNumber } from "class-validator"
 
 export class PaymentDto {
   @IsNumber()
-  amount: number
-  @IsEmail()
-  email: string
+  id: number
 }

@@ -24,15 +24,11 @@ export class RegisterDto {
 }
 export class TelegramLoginDto {
   @IsNumber()
-  telegramID: number
-}
-export class TelegramRegisterDto {
-  @IsEmail()
-  email: string
-  @IsNumber()
-  telegramID: number
+  id: number
   @IsString()
-  firstName: string
+  first_name: string
   @IsString()
-  photoURL: string
+  photo_url: string
+  @IsString()
+  username: string
 }

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import { TypegooseModule } from "nestjs-typegoose"
-import { TelegramUser, UserModel } from "../user/user.model"
+import { TelegramUser } from "../user/user.model"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { AuthController } from "./auth.controller"
 import { JwtModule } from "@nestjs/jwt"
@@ -12,12 +12,6 @@ import { JwtStrategy } from "./strategies/jwt.strategy"
   controllers: [AuthController],
   imports: [
     TypegooseModule.forFeature([
-      {
-        typegooseClass: UserModel,
-        schemaOptions: {
-          collection: "User"
-        }
-      },
       {
         typegooseClass: TelegramUser,
         schemaOptions: {

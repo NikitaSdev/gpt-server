@@ -4,7 +4,6 @@ import { AppService } from "./app.service"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { getMongoDbConfig } from "./config/mongo.config"
 import { AuthModule } from "./auth/auth.module"
-import { UserModule } from "./user/user.module"
 import { TypegooseModule } from "nestjs-typegoose"
 import { PaymentModule } from "./payment/payment.module"
 import { TaskModule } from "./task/task.module"
@@ -18,7 +17,6 @@ import { TaskModule } from "./task/task.module"
       useFactory: getMongoDbConfig
     }),
     AuthModule,
-    UserModule,
     PaymentModule,
     TaskModule
   ],

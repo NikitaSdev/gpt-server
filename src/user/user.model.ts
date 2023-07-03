@@ -1,50 +1,23 @@
 import { Base, TimeStamps } from "@typegoose/typegoose/lib/defaultClasses"
 import { prop } from "@typegoose/typegoose"
 
-export interface UserModel extends Base {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TelegramUser extends Base {}
 export class TelegramUser extends TimeStamps {
   @prop()
-  email: string
+  first_name: string
   @prop()
-  firstName: string
+  photo_url: string
   @prop()
-  photoURL: string
+  username: string
   @prop({ unique: true })
   telegramID: number
   @prop({ default: false })
-  activated: boolean
-  @prop()
-  activationLink: string
-  @prop({ default: false })
   subscribe: boolean
   @prop({ default: new Date() })
   subscribeExpiresAt: Date = new Date()
   @prop({ default: "" })
   payment_id: string
-}
-
-export class UserModel extends TimeStamps {
-  @prop({ unique: true })
-  login: string
-  @prop()
-  email: string
-  @prop()
-  emailOrLogin?: string
-  @prop()
-  password: string
-  @prop({ default: false })
-  subscribe: boolean
-  @prop({ default: new Date() })
-  subscribeExpiresAt: Date = new Date()
-  @prop({ default: false })
-  isAdmin: boolean
-  @prop({ each: true })
-  telegram: number[]
-  @prop({ default: false })
-  activated: boolean
-  @prop()
-  activationLink: string
-  @prop({ default: "" })
-  payment_id: string
+  @prop({ default: 0 })
+  usage: number
 }

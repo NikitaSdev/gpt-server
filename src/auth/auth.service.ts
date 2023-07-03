@@ -5,175 +5,59 @@ import {
 } from "@nestjs/common"
 import { InjectModel } from "nestjs-typegoose"
 import { ModelType } from "@typegoose/typegoose/lib/types"
-import { TelegramUser, UserModel } from "src/user/user.model"
-import {
-  AuthDto,
-  RegisterDto,
-  TelegramLoginDto,
-  TelegramRegisterDto
-} from "./dto/auth.dto"
-import { compare, genSalt, hash } from "bcryptjs"
+import { TelegramUser } from "src/user/user.model"
+import { TelegramLoginDto } from "./dto/auth.dto"
 import { JwtService } from "@nestjs/jwt"
 import { RefreshTokenDto } from "./dto/refreshToken.dto"
-import { MailService } from "../service/mail.service"
-import { v4 as uuidv4 } from "uuid"
+
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>,
     @InjectModel(TelegramUser)
     private readonly TelegramUser: ModelType<TelegramUser>,
     private readonly jwtService: JwtService
   ) {}
 
-  async login(dto: AuthDto) {
-    const user = await this.validateUser(dto)
-    const tokens = await this.issueTokenPair(String(user._id))
-    return {
-      user: this.returnUserFields(user),
-      ...tokens
-    }
-  }
-  async register(dto: RegisterDto) {
-    const mailService = new MailService()
-    const emailMatch = await this.UserModel.findOne({
-      email: dto.email
-    })
-    const loginMatch = await this.UserModel.findOne({
-      login: dto.login
-    })
-    if (loginMatch) {
-      throw new BadRequestException("This login is already taken")
-    }
-    if (emailMatch) {
-      throw new BadRequestException("This email is already taken")
-    }
-    const salt = await genSalt()
-    const newUser = new this.UserModel({
-      email: dto.email,
-      login: dto.login,
-      activationLink: uuidv4(),
-      password: await hash(dto.password, salt)
-    })
-
-    const tokens = await this.issueTokenPair(String(newUser._id))
-    const telegramUser = await this.TelegramUser.findOne({ email: dto.email })
-    if ((telegramUser && telegramUser.activated) || newUser.activated) {
-      newUser.activated = true
-      telegramUser.activated = true
-    }
-    if ((telegramUser && !telegramUser.activated) || !newUser.activated) {
-      await mailService.sendActivationMail(
-        dto.email,
-        `${process.env.API_URL}/api/auth/activate/${newUser.activationLink}`
-      )
-    }
-    const user = await newUser.save()
-    return {
-      user: this.returnUserFields(user),
-      ...tokens
-    }
-  }
   async telegramLogin(dto: TelegramLoginDto) {
     const user = await this.TelegramUser.findOne({
-      telegramID: dto.telegramID
+      telegramID: dto.id
     })
     if (!user) {
-      throw new UnauthorizedException("User not found")
+      console.log(typeof dto.id)
+      const newUser = new this.TelegramUser({
+        telegramID: dto.id,
+        first_name: dto.first_name
+      })
+
+      await newUser.save()
+      const tokens = await this.issueTokenPair(String(dto.id))
+
+      return {
+        user: {
+          usage: newUser.usage,
+          telegramID: newUser.telegramID,
+          first_name: newUser.first_name,
+          subscribe: newUser.subscribe,
+          subscribeExpiresAt: newUser.subscribeExpiresAt
+        },
+        ...tokens
+      }
     }
-    const tokens = await this.issueTokenPair(String(user._id))
+    const tokens = await this.issueTokenPair(String(dto.id))
     return {
-      user: user.firstName,
-      photoURL: user.photoURL,
-      telegramID: user.telegramID,
+      user: {
+        usage: user.usage,
+        id: user.telegramID,
+        first_name: user.first_name,
+        subscribe: user.subscribe,
+        subscribeExpiresAt: user.subscribeExpiresAt
+      },
       ...tokens
     }
   }
-  async telegramRegister(dto: TelegramRegisterDto) {
-    const mailService = new MailService()
-    const commonUser = await this.UserModel.findOne({
-      email: dto.email
-    }).exec()
-    if (commonUser) {
-      commonUser.telegram[0] = dto.telegramID
-      await commonUser.save()
-    }
-    const IDMatch = await this.TelegramUser.findOne({
-      telegramID: dto.telegramID
-    })
-    if (IDMatch) {
-      throw new BadRequestException("You already has an account")
-    }
-    const newUser = new this.TelegramUser({
-      email: dto.email,
-      activationLink: uuidv4(),
-      telegramID: dto.telegramID,
-      photoURL: dto.photoURL,
-      firstName: dto.firstName
-    })
 
-    const tokens = await this.issueTokenPair(String(newUser._id))
-    if (commonUser && commonUser.activated) {
-      newUser.activated = true
-      commonUser.activated = true
-    }
-    if (!newUser.activated && !commonUser.activated) {
-      await mailService.sendActivationMail(
-        dto.email,
-        `${process.env.API_URL}/api/auth/activate/${newUser.activationLink}`
-      )
-    }
-    const user = await newUser.save()
-    return {
-      user: user.firstName,
-      email: user.email,
-      telegramID: dto.telegramID,
-      photoURL: user.photoURL,
-      ...tokens
-    }
-  }
-  async activate(activationLink: string) {
-    const user = await this.UserModel.findOne({ activationLink })
-    const telegramUser = await this.TelegramUser.findOne({ activationLink })
-    if (user) {
-      const findTelegram = await this.TelegramUser.findOne({
-        telegram: user.telegram[0]
-      })
-      if (findTelegram) {
-        findTelegram.activated = true
-        await findTelegram.save()
-      }
-      user.activated = true
-      await user.save()
-    }
-    if (telegramUser) {
-      const findUser = await this.UserModel.findOne({
-        telegram: [telegramUser.telegramID]
-      })
-      if (findUser) {
-        findUser.activated = true
-        await findUser.save()
-      }
-      telegramUser.activated = true
-      await telegramUser.save()
-    }
-  }
-
-  async validateUser(dto: AuthDto): Promise<UserModel> {
-    const User = await this.UserModel.findOne({
-      $or: [{ email: dto.emailOrLogin }, { login: dto.emailOrLogin }]
-    })
-    if (!User) {
-      throw new UnauthorizedException("User not found")
-    }
-    const isValidPassword = await compare(dto.password, User.password)
-    if (!isValidPassword) {
-      throw new UnauthorizedException("Wrong password")
-    }
-    return User
-  }
   async issueTokenPair(userId: string) {
-    const data = { _id: userId }
+    const data = { id: userId }
     const refreshToken = await this.jwtService.signAsync(data, {
       expiresIn: "15d"
     })
@@ -183,26 +67,36 @@ export class AuthService {
     })
     return { refreshToken, accessToken }
   }
-  returnUserFields(user: UserModel) {
+  returnUserFields(user: TelegramUser) {
     return {
-      _id: user._id,
-      login: user.login,
-      email: user.email,
-      subscribe: user.subscribe,
-      subscribeExpiresAt: user.subscribeExpiresAt,
-      isAdmin: user.isAdmin,
-      activated: user.activated
+      user: {
+        usage: user.usage,
+        id: user.telegramID,
+        first_name: user.first_name,
+        subscribe: user.subscribe,
+        subscribeExpiresAt: user.subscribeExpiresAt
+      }
     }
+  }
+  async handleUsage(id: { telegramID: number }) {
+    const user = await this.TelegramUser.findOne({
+      telegramID: id.telegramID
+    })
+
+    if (!user) throw new BadRequestException("Пользователь не найден")
+    user.usage = user.usage + 1
+    await user.save()
+    return user
   }
   async getNewTokens({ refreshToken }: RefreshTokenDto) {
     if (!refreshToken) {
-      throw new UnauthorizedException("Sign in, bastard")
+      throw new UnauthorizedException("Sign in")
     }
     const result = await this.jwtService.verifyAsync(refreshToken)
     if (!result) {
       throw new UnauthorizedException("Invalid token or expired")
     }
-    const user = await this.UserModel.findById(result._id)
+    const user = await this.TelegramUser.findOne(result._id)
     const tokens = await this.issueTokenPair(String(user._id))
     return {
       user: this.returnUserFields(user),
