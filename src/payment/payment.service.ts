@@ -32,7 +32,7 @@ export class PaymentService {
         },
         confirmation: {
           type: "redirect",
-          return_url: "https://green-apes-search.loca.lt"
+          return_url: "https://djipiti.ru"
         },
         description: "Покупка подписки на месяц"
       })
