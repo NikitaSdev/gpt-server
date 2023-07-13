@@ -69,13 +69,11 @@ export class AuthService {
   }
   returnUserFields(user: TelegramUser) {
     return {
-      user: {
-        usage: user.usage,
-        id: user.telegramID,
-        first_name: user.first_name,
-        subscribe: user.subscribe,
-        subscribeExpiresAt: user.subscribeExpiresAt
-      }
+      usage: user.usage,
+      id: user.telegramID,
+      first_name: user.first_name,
+      subscribe: user.subscribe,
+      subscribeExpiresAt: user.subscribeExpiresAt
     }
   }
   async handleUsage(id: { telegramID: number }) {
