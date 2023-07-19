@@ -84,7 +84,7 @@ export class AuthService {
     if (!user) throw new BadRequestException("Пользователь не найден")
     user.usage = user.usage + 1
     await user.save()
-    return user
+    return this.returnUserFields(user)
   }
   async getNewTokens({ refreshToken }: RefreshTokenDto) {
     if (!refreshToken) {

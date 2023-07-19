@@ -6,8 +6,8 @@ import { ModelType } from "@typegoose/typegoose/lib/types"
 import { TelegramUser } from "src/user/user.model"
 
 const yooKassa = new YooKassa({
-  shopId: "317449",
-  secretKey: "test_4sIlBBtVlaWCBQ1TaKF2JM6bOGpgILpWkiwes9nWCV8"
+  shopId: "315119",
+  secretKey: "live_x44qx5Em3hnW_JutdPAfF2fQNEDMei4_bsHjazOtQ5Q"
 })
 
 export class PaymentService {
@@ -29,6 +29,24 @@ export class PaymentService {
         capture: true,
         payment_method_data: {
           type: "bank_card"
+        },
+        receipt: {
+          customer: {
+            email: dto.email
+          },
+          items: [
+            {
+              description: "Подписка на месяц",
+              quantity: "1",
+              amount: {
+                value: "300.00",
+                currency: "RUB"
+              },
+              vat_code: "1",
+              payment_mode: "full_prepayment",
+              payment_subject: "service"
+            }
+          ]
         },
         confirmation: {
           type: "redirect",
