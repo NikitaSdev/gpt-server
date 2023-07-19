@@ -10,23 +10,6 @@ export class TaskService {
     @InjectModel(TelegramUser)
     private readonly TelegramUser: ModelType<TelegramUser>
   ) {}
-  @Cron("* * * * * 6")
-  async handleActivation() {
-    try {
-      const telegramUsers = await this.TelegramUser.find({
-        activated: false
-      })
-
-      for (const user of telegramUsers) {
-        await user.remove()
-        console.log(
-          `User with email ${(await user).first_name} has been removed.`
-        )
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }
   @Cron("* * 12 * * *")
   async handleSubscribe() {
     try {
