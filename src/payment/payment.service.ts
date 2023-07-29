@@ -6,8 +6,8 @@ import { ModelType } from "@typegoose/typegoose/lib/types"
 import { TelegramUser } from "src/user/user.model"
 
 const yooKassa = new YooKassa({
-  shopId: "315119",
-  secretKey: "live_x44qx5Em3hnW_JutdPAfF2fQNEDMei4_bsHjazOtQ5Q"
+  shopId: "237031",
+  secretKey: "test_AuOmDn5XqDprdqvK6AHHFF8zxCJH_YaEtu7MhJKGbqc"
 })
 
 export class PaymentService {
@@ -50,7 +50,7 @@ export class PaymentService {
         },
         confirmation: {
           type: "redirect",
-          return_url: "https://djipiti.ru"
+          return_url: "https://djipiti.chat"
         },
         description: "Покупка подписки на месяц"
       })
@@ -73,7 +73,7 @@ export class PaymentService {
         telegramUser.subscribe = true
         telegramUser.subscribeExpiresAt = new Date(dto.object.captured_at)
         telegramUser.subscribeExpiresAt.setDate(
-          telegramUser.subscribeExpiresAt.getDate() + 31
+          telegramUser.subscribeExpiresAt.getDate() + 30
         )
         await telegramUser.save()
       }
