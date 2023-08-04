@@ -94,10 +94,11 @@ export class AuthService {
     if (!result) {
       throw new UnauthorizedException("Invalid token or expired")
     }
+    console.log(result)
     const user = await this.TelegramUser.findOne({ telegramID: result.id })
     const tokens = await this.issueTokenPair(String(user._id))
     return {
-      user: user,
+      user: this.returnUserFields(user),
       ...tokens
     }
   }
