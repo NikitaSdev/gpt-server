@@ -10,7 +10,7 @@ export class TaskService {
     @InjectModel(TelegramUser)
     private readonly TelegramUser: ModelType<TelegramUser>
   ) {}
-  @Cron("* * 12 * * *")
+  @Cron("0 0 0 * * *")
   async handleSubscribe() {
     try {
       const currentTime = new Date()
@@ -22,6 +22,20 @@ export class TaskService {
         user.subscribe = false
         await user.save()
         console.log(`${user.first_name} has no longer subscribe.`)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  @Cron("0 0 0 * * *")
+  async handleUsage() {
+    try {
+      const telegramUsers = await this.TelegramUser.find()
+
+      for (const user of telegramUsers) {
+        user.usage = 0
+        await user.save()
+        console.log(`${user.first_name} reset usage`)
       }
     } catch (e) {
       console.log(e)
