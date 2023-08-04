@@ -30,7 +30,7 @@ export class AuthService {
       })
 
       await newUser.save()
-      const tokens = await this.issueTokenPair(String(dto.id))
+      const tokens = await this.issueTokenPair(String(newUser._id))
 
       return {
         user: {
@@ -43,7 +43,7 @@ export class AuthService {
         ...tokens
       }
     }
-    const tokens = await this.issueTokenPair(String(dto.id))
+    const tokens = await this.issueTokenPair(String(user._id))
     return {
       user: {
         usage: user.usage,
@@ -95,7 +95,8 @@ export class AuthService {
       throw new UnauthorizedException("Invalid token or expired")
     }
     console.log(result)
-    const user = await this.TelegramUser.findOne({ telegramID: result.id })
+    const user = await this.TelegramUser.findOne({ _id: result.id })
+    console.log(user)	
     const tokens = await this.issueTokenPair(String(user._id))
     return {
       user: this.returnUserFields(user),

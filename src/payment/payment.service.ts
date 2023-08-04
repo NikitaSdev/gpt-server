@@ -6,8 +6,8 @@ import { ModelType } from "@typegoose/typegoose/lib/types"
 import { TelegramUser } from "src/user/user.model"
 
 const yooKassa = new YooKassa({
-  shopId: "237031",
-  secretKey: "test_AuOmDn5XqDprdqvK6AHHFF8zxCJH_YaEtu7MhJKGbqc"
+  shopId: "232578",
+  secretKey: "live_wes5NyCV6sbhz_8F4-9ms5igTbTNjfLc3l76YRVa6xY"
 })
 
 export class PaymentService {
@@ -23,7 +23,7 @@ export class PaymentService {
 
       const payment = await yooKassa.createPayment({
         amount: {
-          value: "300.00",
+          value: "500.00",
           currency: "RUB"
         },
         capture: true,
@@ -39,7 +39,7 @@ export class PaymentService {
               description: "Подписка на месяц",
               quantity: "1",
               amount: {
-                value: "300.00",
+                value: "500.00",
                 currency: "RUB"
               },
               vat_code: "1",
