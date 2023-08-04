@@ -6,10 +6,6 @@ export interface TelegramUser extends Base {}
 export class TelegramUser extends TimeStamps {
   @prop()
   first_name: string
-  @prop()
-  photo_url: string
-  @prop()
-  username: string
   @prop({ unique: true })
   telegramID: number
   @prop({ default: false })
